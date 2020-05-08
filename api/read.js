@@ -1,30 +1,22 @@
-const cache = require('memory-cache');
-const process = require('../process')
-const utils = require('../request')
-
-const READ_ONLY_TOKEN_PATTERN = '([a-z]{12})'
-const READ_ONLY_TOKEN_REGEX = new RegExp(`^${READ_ONLY_TOKEN_PATTERN}$`)
+const cache = require('node-cache');
+const apiCache = new NodeCache({ stdTTL: 600 });
+const process = require('../src/index');
 
 module.exports = async (req, res) => {
-    const { token } = req.query
-    if (READ_ONLY_TOKEN_REGEX.test(token)){
-        const previous_build = cache.get(utils.compiledResponseKey(token))
-        if (!previous_build) {
-            try {
-                const compiled = await process(token)
-                res.status(200).send(compiled)
-            } catch (e) {
-                res.status(500).send({
-                    status: e.statusCode,
-                    stage: e.message
-                });
-            }
-        } else {
-            res.status(200).send(previous_build)
+    const { token } = req.query;
+    const previous_build = apiCache.get(token);
+    if (!previous_build) {
+        try {
+            const compiled = await process(token);
+            apiCache.set(`${token}`, compiled);
+            res.status(200).send(compiled);
+        } catch (e) {
+            res.status(200).send({
+                status: e.statusCode,
+                stage: e.message,
+            });
         }
     } else {
-        res.status(404).send({
-            message: "token is invaild"
-        })
+        res.status(200).send(previous_build);
     }
-}
+};

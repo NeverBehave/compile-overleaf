@@ -1,54 +1,52 @@
-const axios = require("axios");
-const cache = require('memory-cache');
-const utils = require("./request");
-const base = "https://www.overleaf.com";
+const axios = require('axios');
+const cache = require('./cache');
+const utils = require('./request');
+const base = 'https://www.overleaf.com';
 const url = (token) => `${base}/read/${token}`;
 const grantUrl = (token) => `${url(token)}/grant`;
 const projectUrl = (projectId) => `${base}/project/${projectId}`;
-const compileUrl = (projectId) =>
-  `${projectUrl(projectId)}/compile?auto_compile=true`;
+const compileUrl = (projectId) => `${projectUrl(projectId)}/compile?auto_compile=true`;
 
 const errorHandler = (e, message) => {
-  console.log(e);
-  const err = new Error(message);
-  err.statusCode = e.response.status;
-  throw err;
+    const err = new Error(message);
+    err.statusCode = e.response.status;
+    throw err;
 };
 
 const readContent = async (token) =>
-  axios({
-    method: "get",
-    url: url(token),
-  })
-    .then((res) => {
-      utils.parseHTMLRequest(token, res);
+    axios({
+        method: 'get',
+        url: url(token),
     })
-    .catch((e) => {
-      errorHandler(e, "reading");
-    });
+        .then((res) => {
+            utils.parseHTMLRequest(token, res);
+        })
+        .catch((e) => {
+            errorHandler(e, 'reading');
+        });
 
 const grantContent = async (token) =>
-  axios({
-    url: grantUrl(token),
-    method: "post",
-    headers: utils.buildHeader(token),
-    data: utils.CSRFData(token),
-  }).catch((e) => {
-    errorHandler(e, "granting permission");
-  });
+    axios({
+        url: grantUrl(token),
+        method: 'post',
+        headers: utils.buildHeader(token),
+        data: utils.CSRFData(token),
+    }).catch((e) => {
+        errorHandler(e, 'granting permission');
+    });
 
 const projectContent = async (token) => {
-  return axios({
-    method: "get",
-    url: projectUrl(utils.getProjectId(token)),
-    headers: utils.buildHeader(token),
-  })
-    .then((res) => {
-      utils.parseHTMLRequest(token, res);
+    return axios({
+        method: 'get',
+        url: projectUrl(utils.getProjectId(token)),
+        headers: utils.buildHeader(token),
     })
-    .catch((e) => {
-      errorHandler(e, "loading project");
-    });
+        .then((res) => {
+            utils.parseHTMLRequest(token, res);
+        })
+        .catch((e) => {
+            errorHandler(e, 'loading project');
+        });
 };
 
 /**
@@ -65,20 +63,20 @@ const projectContent = async (token) => {
  * @param {String} token
  */
 const compileContent = async (token) => {
-  return axios({
-    method: "post",
-    url: compileUrl(utils.getProjectId(token)),
-    headers: utils.buildHeader(token),
-    data: {
-      ...utils.CSRFData(token),
-      rootDoc_id: null,
-      draft: false,
-      check: "silent",
-      incrementalCompilesEnabled: false,
-    },
-  }).catch((e) => {
-    errorHandler(e, "compling project");
-  });
+    return axios({
+        method: 'post',
+        url: compileUrl(utils.getProjectId(token)),
+        headers: utils.buildHeader(token),
+        data: {
+            ...utils.CSRFData(token),
+            rootDoc_id: null,
+            draft: false,
+            check: 'silent',
+            incrementalCompilesEnabled: false,
+        },
+    }).catch((e) => {
+        errorHandler(e, 'compling project');
+    });
 };
 
 // https://compiles.overleaf.com/project/5bb6c231bc1bd011575f8ac6
@@ -86,28 +84,27 @@ const compileContent = async (token) => {
 // /build/171f620ef1b-de3e67d3e3ce47ec/output/output.pdf
 // ?compileGroup=standard&clsiserverid=clsi-pre-emp-e2-a-wpzl&pdfng=true
 const compilePDFUrl = async (content) => {
-  const extracted = {}
-  if (content.status === 'success') {
-    content.outputFiles.forEach(e => {
-      extracted[e.type] = `${content.pdfDownloadDomain}${e.url}?compileGroup=${content.compileGroup}&clsiserverid=${content.clsiServerId}`
-    })
-  }
-  return extracted
+    const extracted = {};
+    if (content.status === 'success') {
+        content.outputFiles.forEach((e) => {
+            extracted[e.type] = `${content.pdfDownloadDomain}${e.url}?compileGroup=${content.compileGroup}&clsiserverid=${content.clsiServerId}`;
+        });
+    }
+    return extracted;
 };
 
 const buildProcess = async (token) => {
-  try {
-    await readContent(token)
-    const grant = await grantContent(token)
-    cache.put(utils.projectIdKey(token), grant.data.redirect.slice(9));
-    await projectContent(token)
-    const compile = await compileContent(token)
-    const compileObj = compilePDFUrl(compile.data)
-    cache.put(utils.compiledResponseKey(token), compileObj)
-    return compileObj
-  } catch (e) {
-    throw e  
-  }
-}
+    try {
+        await readContent(token);
+        const grant = await grantContent(token);
+        cache.set(utils.projectIdKey(token), grant.data.redirect.slice(9));
+        await projectContent(token);
+        const compile = await compileContent(token);
+        const compileObj = compilePDFUrl(compile.data);
+        return compileObj;
+    } catch (e) {
+        throw e;
+    }
+};
 
-module.exports = buildProcess
+module.exports = buildProcess;

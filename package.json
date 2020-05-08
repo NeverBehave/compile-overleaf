@@ -1,6 +1,44 @@
 {
-  "dependencies": {
-    "axios": "^0.19.2",
-    "memory-cache": "^0.2.0"
-  }
+    "name": "compile-overleaf",
+    "version": "0.0.0-development",
+    "description": "Using a read key to get compiled pdf from overleaf",
+    "main": "src/index.js",
+    "files": [
+        "src"
+    ],
+    "scripts": {
+        "format": "prettier \"**/*.{js,json,md}\" --write",
+        "format:staged": "pretty-quick --staged --verbose --pattern \"**/*.{js,json,md}\"",
+        "semantic-release": "semantic-release"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/NeverBehave/compile-overleaf/"
+    },
+    "keywords": [
+        "overleaf",
+        "pdf",
+        "compile"
+    ],
+    "author": "NeverBehave <gayhub@never.pet>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/NeverBehave/compile-overleaf/issues"
+    },
+    "homepage": "https://github.com/NeverBehave/compile-overleaf",
+    "dependencies": {
+        "axios": "^0.19.2",
+        "node-cache": "^0.2.0"
+    },
+    "devDependencies": {
+        "husky": "^4.2.5",
+        "prettier": "^2.0.5",
+        "pretty-quick": "^2.0.1",
+        "semantic-release": "^17.0.7"
+    }
 }
