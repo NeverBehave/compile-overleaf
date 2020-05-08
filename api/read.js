@@ -1,9 +1,9 @@
 const cache = require('node-cache');
-const apiCache = new NodeCache({ stdTTL: 600 });
+const apiCache = new cache({ stdTTL: 600 });
 const process = require('../src/index');
 
 module.exports = async (req, res) => {
-    const { token } = req.query;
+    const { token = '' } = req.query;
     const previous_build = apiCache.get(token);
     if (!previous_build) {
         try {
