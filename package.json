@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "axios": "^0.19.2",
+    "memory-cache": "^0.2.0"
+  }
+}
