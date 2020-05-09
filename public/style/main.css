@@ -1,0 +1,16 @@
+.starter-template {
+    padding-top: 150px;
+    text-align: center;
+}
+
+.main {
+    position: absolute;
+    top: 70px; /* Header Height */
+    width: 100%;
+    height: calc(100% - 70px); /* okey, it works. */
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+}
