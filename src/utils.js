@@ -2,7 +2,7 @@ const cache = require('./cache').cache;
 const { cookieStringKey, projectIdKey, refererKey, CSRFKey } = require('./cache').keys;
 
 const getCSRF = (html) => {
-    const csrfRegex = /window\.csrfToken = "(.*)";/;
+    const csrfRegex = /<meta name="ol-csrfToken" content="(.*?)">/;
     return html.match(csrfRegex)[1];
 };
 

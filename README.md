@@ -15,8 +15,10 @@ try {
     const compiled = await compileOverleaf(token);
 
     /**
-     * 'type': 'url'
-     * {pdf: 'https://compiles.overleaf.com/....'}
+     * {
+     *  name: 'projectName',
+     *  link: {pdf: 'https://compiles.overleaf.com/....'}
+     * }
      **/
     console.log(compiled);
 } catch (e) {
@@ -28,8 +30,14 @@ try {
 }
 ```
 
-## API
+## Online Demo
 
-https://compile-overleaf.now.sh/api/read?token={token}
+`https://compile-overleaf.now.sh/#{token}`
 
-> e.g. https://compile-overleaf.now.sh/api/read?token=fjspyrhfrsgc
+> e.g. <https://compile-overleaf.now.sh/#fjspyrhfrsgc>
+
+### API
+
+`https://compile-overleaf.now.sh/api/read?token={token}`
+
+> e.g. <https://compile-overleaf.now.sh/api/read?token=fjspyrhfrsgc>

@@ -28,6 +28,7 @@ function onFetchSuccess(e, token) {
     frame.id = 'pdf-iframe';
     $('#main-frame').append(frame);
     // Download Button
+    console.log(e)
     $('#download-button')
         .attr('data-filename', e.name + '.pdf')
         .attr('data-link', e.link.pdf)
@@ -40,12 +41,12 @@ if (token) {
         url: api + token,
         success: (e) => {
             if (e.stage) {
-                onFetchError(e);
+                onFetchError(e, token);
             } else {
-                onFetchSuccess(e);
+                onFetchSuccess(e, token);
             }
         },
     });
 } else {
-    //location.href = projectUrl
+    location.href = projectUrl;
 }
