@@ -47,5 +47,5 @@ if (token) {
         },
     });
 } else {
-    //location.href = projectUrl
+    location.href = projectUrl;
 }
