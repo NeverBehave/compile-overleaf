@@ -1,8 +1,14 @@
-const cache = require('./cache');
+const cache = require('./cache').cache;
+const { cookieStringKey, projectIdKey, refererKey, CSRFKey } = require('./cache').keys;
 
 const getCSRF = (html) => {
     const csrfRegex = /window\.csrfToken = "(.*)";/;
     return html.match(csrfRegex)[1];
+};
+
+const getProjectTitle = (html) => {
+    const titleRegex = /<meta name="og:title" content="(.*?)">/;
+    return html.match(titleRegex)[1];
 };
 
 const getCookieString = (cookies) => {
@@ -12,12 +18,6 @@ const getCookieString = (cookies) => {
         })
         .join(';');
 };
-
-const CSRFKey = (key) => `csrf-${key}`;
-const cookieStringKey = (key) => `cookie-${key}`;
-const projectIdKey = (key) => `projectId-${key}`;
-const compiledResponseKey = (key) => `compiled-${key}`;
-const refererKey = (key) => `referer-${key}`;
 
 const getProjectId = (key) => cache.get(projectIdKey(key));
 
@@ -44,13 +44,9 @@ const parseHTMLRequest = async (key, response) => {
 };
 
 module.exports = {
-    CSRFKey,
     CSRFData,
-    cookieStringKey,
-    projectIdKey,
-    compiledResponseKey,
-    refererKey,
     buildHeader,
     parseHTMLRequest,
     getProjectId,
+    getProjectTitle,
 };

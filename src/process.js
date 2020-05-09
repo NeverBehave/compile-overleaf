@@ -1,6 +1,7 @@
 const axios = require('axios');
-const cache = require('./cache');
-const utils = require('./request');
+const cache = require('./cache').cache;
+const { projectTitleKey, projectIdKey } = require('./cache').keys;
+const utils = require('./utils');
 const base = 'https://www.overleaf.com';
 const url = (token) => `${base}/read/${token}`;
 const grantUrl = (token) => `${url(token)}/grant`;
@@ -43,6 +44,8 @@ const projectContent = async (token) => {
     })
         .then((res) => {
             utils.parseHTMLRequest(token, res);
+            const title = utils.getProjectTitle(res.data);
+            title && cache.set(projectTitleKey(token), title);
         })
         .catch((e) => {
             errorHandler(e, 'loading project');
@@ -90,6 +93,7 @@ const compilePDFUrl = async (content) => {
             extracted[e.type] = `${content.pdfDownloadDomain}${e.url}?compileGroup=${content.compileGroup}&clsiserverid=${content.clsiServerId}`;
         });
     }
+
     return extracted;
 };
 
@@ -97,10 +101,13 @@ const buildProcess = async (token) => {
     try {
         await readContent(token);
         const grant = await grantContent(token);
-        cache.set(utils.projectIdKey(token), grant.data.redirect.slice(9));
+        cache.set(projectIdKey(token), grant.data.redirect.slice(9));
         await projectContent(token);
         const compile = await compileContent(token);
-        const compileObj = compilePDFUrl(compile.data);
+        const compileObj = {
+            name: cache.get(projectTitleKey(token)),
+            link: await compilePDFUrl(compile.data),
+        };
         return compileObj;
     } catch (e) {
         throw e;

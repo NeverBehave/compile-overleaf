@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
             apiCache.set(`${token}`, compiled);
             res.status(200).send(compiled);
         } catch (e) {
+            // console.log(e)
             res.status(200).send({
                 status: e.statusCode,
                 stage: e.message,
