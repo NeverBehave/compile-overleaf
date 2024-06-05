@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
         res.status(404).send(`Invaild Link: ${link}`);
         return;
     }
-    if (link.hostname === 'compiles.overleaf.com') {
+    if (link.hostname === 'compiles.overleafusercontent.com') {
         axios({
             url: link.href,
             responseType: 'stream',
