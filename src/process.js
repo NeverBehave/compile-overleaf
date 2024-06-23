@@ -18,6 +18,7 @@ const readContent = async (token) =>
     axios({
         method: 'get',
         url: url(token),
+        headers: utils.defaultHeader(),
     })
         .then((res) => {
             utils.parseHTMLRequest(token, res);
@@ -32,9 +33,14 @@ const grantContent = async (token) =>
         method: 'post',
         headers: utils.buildHeader(token),
         data: utils.CSRFData(token),
-    }).catch((e) => {
-        errorHandler(e, 'granting permission');
-    });
+    })
+        .then((res) => {
+            utils.setLatestCookie(token, res);
+            return res;
+        })
+        .catch((e) => {
+            errorHandler(e, 'granting permission');
+        });
 
 const projectContent = async (token) => {
     return axios({
